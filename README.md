@@ -21,7 +21,7 @@ sync github prs to local yaml files for code review and analysis.
 cargo install --path .
 
 # install claude skill
-gh-pr-sync install
+gh-pr-sync skill claude
 
 # pull prs from current repo
 gh-pr-sync pull
@@ -57,13 +57,14 @@ options:
 - `--limit`: max prs to fetch (default: 100)
 - `--all`: include closed and merged prs
 
-### install
+### skill
 
 ```bash
-gh-pr-sync install
+# install for claude
+gh-pr-sync skill claude
 ```
 
-installs the claude skill to `~/.claude/skills/gh-pr-sync/`.
+installs the skill for the specified AI assistant. currently supports `claude` (`~/.claude/skills/gh-pr-sync/`).
 
 ## output format
 

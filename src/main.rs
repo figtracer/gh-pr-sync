@@ -26,8 +26,17 @@ enum Commands {
         #[arg(long)]
         all: bool,
     },
-    /// Install the Claude skill to ~/.claude/skills/gh-pr-sync/
-    Install,
+    /// Install skill for an AI assistant
+    Skill {
+        #[command(subcommand)]
+        target: SkillTarget,
+    },
+}
+
+#[derive(Subcommand)]
+enum SkillTarget {
+    /// Install to ~/.claude/skills/gh-pr-sync/
+    Claude,
 }
 
 #[derive(Debug, Deserialize)]
@@ -223,7 +232,7 @@ fn pull_prs(repo: Option<String>, limit: u32, all: bool) -> Result<()> {
     Ok(())
 }
 
-fn install_skill() -> Result<()> {
+fn install_claude_skill() -> Result<()> {
     let home = std::env::var("HOME").context("HOME environment variable not set")?;
     let skill_dir = Path::new(&home).join(".claude/skills/gh-pr-sync");
 
@@ -243,6 +252,8 @@ fn main() -> Result<()> {
 
     match cli.command {
         Commands::Pull { repo, limit, all } => pull_prs(repo, limit, all),
-        Commands::Install => install_skill(),
+        Commands::Skill { target } => match target {
+            SkillTarget::Claude => install_claude_skill(),
+        },
     }
 }
