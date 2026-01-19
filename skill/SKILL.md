@@ -51,3 +51,13 @@ Use this to find recently changed files and optimization opportunities in open s
 gh-pr-sync pull --repo owner/repo --limit 20
 cat .prs/*.yaml
 ```
+
+## Reading Specific PRs
+
+Files are named `<number>-<slug>.yaml`. To read specific PRs by number, use glob patterns:
+
+```
+cat .prs/42-*.yaml              # Read PR #42
+cat .prs/100-*.yaml .prs/101-*.yaml  # Read multiple PRs
+ls .prs/                        # List all PR files
+```
