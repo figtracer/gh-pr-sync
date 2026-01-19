@@ -26,6 +26,8 @@ enum Commands {
         #[arg(long)]
         all: bool,
     },
+    /// Install the Claude skill to ~/.claude/skills/gh-pr-sync/
+    Install,
 }
 
 #[derive(Debug, Deserialize)]
@@ -221,10 +223,26 @@ fn pull_prs(repo: Option<String>, limit: u32, all: bool) -> Result<()> {
     Ok(())
 }
 
+fn install_skill() -> Result<()> {
+    let home = std::env::var("HOME").context("HOME environment variable not set")?;
+    let skill_dir = Path::new(&home).join(".claude/skills/gh-pr-sync");
+
+    fs::create_dir_all(&skill_dir).context("Failed to create skill directory")?;
+
+    let skill_content = include_str!("../skill/SKILL.md");
+    let skill_path = skill_dir.join("SKILL.md");
+
+    fs::write(&skill_path, skill_content).context("Failed to write SKILL.md")?;
+
+    eprintln!("Installed skill to {}", skill_path.display());
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
         Commands::Pull { repo, limit, all } => pull_prs(repo, limit, all),
+        Commands::Install => install_skill(),
     }
 }
