@@ -48,8 +48,10 @@ struct GhPullRequest {
     author: Option<GhAuthor>,
     head_ref_name: String,
     base_ref_name: String,
-    labels: Option<GhLabels>,
-    files: Option<GhFiles>,
+    #[serde(default)]
+    labels: Vec<GhLabel>,
+    #[serde(default)]
+    files: Vec<GhFile>,
     created_at: String,
     updated_at: String,
     merged_at: Option<String>,
@@ -66,18 +68,8 @@ struct GhAuthor {
 }
 
 #[derive(Debug, Deserialize)]
-struct GhLabels {
-    nodes: Vec<GhLabel>,
-}
-
-#[derive(Debug, Deserialize)]
 struct GhLabel {
     name: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct GhFiles {
-    nodes: Vec<GhFile>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -187,10 +179,7 @@ fn pull_prs(repo: Option<String>, limit: u32, all: bool) -> Result<()> {
             author: gh_pr.author.map(|a| a.login).unwrap_or_default(),
             head: gh_pr.head_ref_name,
             base: gh_pr.base_ref_name,
-            labels: gh_pr
-                .labels
-                .map(|l| l.nodes.into_iter().map(|n| n.name).collect())
-                .unwrap_or_default(),
+            labels: gh_pr.labels.into_iter().map(|l| l.name).collect(),
             created_at: gh_pr.created_at.parse().context("Invalid created_at")?,
             updated_at: gh_pr.updated_at.parse().context("Invalid updated_at")?,
             merged_at: gh_pr
@@ -204,17 +193,13 @@ fn pull_prs(repo: Option<String>, limit: u32, all: bool) -> Result<()> {
             is_draft: gh_pr.is_draft,
             files: gh_pr
                 .files
-                .map(|f| {
-                    f.nodes
-                        .into_iter()
-                        .map(|n| FileChange {
-                            path: n.path,
-                            additions: n.additions,
-                            deletions: n.deletions,
-                        })
-                        .collect()
+                .into_iter()
+                .map(|f| FileChange {
+                    path: f.path,
+                    additions: f.additions,
+                    deletions: f.deletions,
                 })
-                .unwrap_or_default(),
+                .collect(),
             body: gh_pr.body.filter(|b| !b.is_empty()),
         };
 
