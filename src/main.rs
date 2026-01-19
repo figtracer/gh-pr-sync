@@ -172,10 +172,17 @@ fn pull_prs(repo: Option<String>, limit: u32, all: bool) -> Result<()> {
     }
 
     for gh_pr in prs {
+        // Determine state: GitHub API returns OPEN/CLOSED, but we want to distinguish merged
+        let state = if gh_pr.merged_at.is_some() {
+            "merged".to_string()
+        } else {
+            gh_pr.state.to_lowercase()
+        };
+
         let pr = PullRequest {
             number: gh_pr.number,
             title: gh_pr.title.clone(),
-            state: gh_pr.state.to_lowercase(),
+            state,
             author: gh_pr.author.map(|a| a.login).unwrap_or_default(),
             head: gh_pr.head_ref_name,
             base: gh_pr.base_ref_name,
