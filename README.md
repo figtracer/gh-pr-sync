@@ -94,16 +94,6 @@ body: |
   pr description here...
 ```
 
-## use case
-
-load prs into context, then ask claude about:
-
-- low-hanging optimization opportunities in recently changed code
-- architectural changes across prs
-- areas with high churn
-- code quality in recent changes
-- similar patterns that could be applied elsewhere
-
 ## license
 
 MIT OR Apache-2.0
